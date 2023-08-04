@@ -30,7 +30,7 @@ def scan_dirs(root_path: str, recursion: bool=True, callback: Callable=None):
 
     return root_path, files
 
-def create_pages(app: Flask, scan_dirs_tuple: dict[list]):  # TODO: index (/) 的路径转换, index 页面内容
+def create_pages(app: Flask, scan_dirs_tuple: dict[list]):
     root_path = scan_dirs_tuple[0]
     scan_dirs_data = scan_dirs_tuple[1]
 
