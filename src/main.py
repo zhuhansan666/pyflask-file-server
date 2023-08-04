@@ -1,9 +1,11 @@
+from htmls import CLI_HELP
 from app import scan_dirs, create_pages
 
 import os
 import sys
 from typing import Any
 from flask import Flask
+from threading import Thread
 
 def get_value(args: list[str], value_name: str, default: Any=None, prefix: str='--', sep: str='=', match_case: bool=False):
     for argv in args:
@@ -37,8 +39,13 @@ WATCH_DIR = get_value(args, 'watch-dir') or get_value(args, 'watchdir') or os.ge
 
 DEBUG = in_value(args, 'debug')
 RECURSION = not (in_value(args, 'no-recursion') or in_value(args, 'norecursion'))
+HELP = in_value(args, 'help')
 
 if __name__ == '__main__':
+    if HELP:
+        print(CLI_HELP)
+        sys.exit(0)
+
     app = Flask(__name__)
     create_pages(app, scan_dirs(WATCH_DIR, RECURSION))
 

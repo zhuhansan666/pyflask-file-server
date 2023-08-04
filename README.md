@@ -1,3 +1,5 @@
+# ![image](./icon.png) pyflask-file-server
+
 ## 这是什么?
 * 这是一个仿照 `python -m http.server` 的文件下载服务器, 基于 [python flask](https://flask.palletsprojects.com/)
 
@@ -5,24 +7,32 @@
 * 并不是它不好用, 而是使用 `flask` 重写后可以使它支持 [断点续传](#什么是断点续传)
 
 ## 好的, 那么我该如何安装呢?
-1. 首先, 请确保您安装了 **`python 3.10`** 或更高版本, 您可以在这里下载我们推荐的版本: [python 3.10.9](https://www.python.org/downloads/release/python-3109/)
-2. 其次, 您应将源码从 `github` 拉取下来
-<br> 运行如下命令
-<br> `git clone https://github.com/zhuhansan666/pyflask-file-server`
-3. 将命令行工作路径转到 `cd ./pyflask-file-server` (←是的, 运行这个)
-4. 然后使用 `python 3.10` (或更高版本) 创建虚拟环境 *(非必要但推荐)*
-<br> 运行如下命令
-<br> 如果您只安装了一个 `python`, 那么您可以直接运行 `python -m venv ./venv` (其中, `./venv` 代表了虚拟环境输出的文件夹)
-<br> 如果您安装了多个 `python`, 那么在 `Windows` 系统下您可以 `py -3.10 -m venv ./venv` (`./venv` 解释同上)
-    > 您安装了 `linux` 或 `Mac OS` 我们假设您应当会基本的命令行操作, 可自行创建
-5. 切换到虚拟环境, 在 `Windows` 上, 应运行 `./venv/Scripts/activate`
-<br> 在 其他操作系统 上, 应运行 `./venv/bin/activate` (我觉得您应当会给文件添加可执行权限, 如 `chomd +x ./venv/bin/activate`)
-6. 安装依赖包
-<br> 运行如下命令
-<br> `pip install -r ./requirements.txt`
-7. 待安装完成后, 您就可以愉快的运行我的代码啦~
-<br> 运行如下命令以运行代码
-<br> `python ./src/main.py`
+* 直接从 `Releases` 下载
+  1. 打开 [Releases 页面](https://github.com/zhuhansan666/pyflask-file-server/releases)
+  2. 找到您所需要的版本 (推荐最新版)
+  3. 下载 `main.win64.zip`
+  4. 解压 `main.win64.zip`
+  5. 使用 `cmd` 或 `powershell` (以及其他命令行终端) 运行解压后释放的目录中的 `main.exe`
+
+* ### 使用 python 运行
+  1. 首先, 请确保您安装了 **`python 3.10`** 或更高版本, 您可以在这里下载我们推荐的版本: [python 3.10.9](https://www.python.org/downloads/release/python-3109/)
+  2. 其次, 您应将源码从 `github` 拉取下来
+  <br> 运行如下命令
+  <br> `git clone https://github.com/zhuhansan666/pyflask-file-server`
+  1. 将命令行工作路径转到 `cd ./pyflask-file-server` (←是的, 运行这个)
+  2. 然后使用 `python 3.10` (或更高版本) 创建虚拟环境 *(非必要但推荐)*
+  <br> 运行如下命令
+  <br> 如果您只安装了一个 `python`, 那么您可以直接运行 `python -m venv ./venv` (其中, `./venv` 代表了虚拟环境输出的文件夹)
+  <br> 如果您安装了多个 `python`, 那么在 `Windows` 系统下您可以 `py -3.10 -m venv ./venv` (`./venv` 解释同上)
+      > 您安装了 `linux` 或 `Mac OS` 我们假设您应当会基本的命令行操作, 可自行创建
+  1. 切换到虚拟环境, 在 `Windows` 上, 应运行 `./venv/Scripts/activate`
+  <br> 在 其他操作系统 上, 应运行 `./venv/bin/activate` (我觉得您应当会给文件添加可执行权限, 如 `chomd +x ./venv/bin/activate`)
+  1. 安装依赖包
+  <br> 运行如下命令
+  <br> `pip install -r ./requirements.txt`
+  1. 待安装完成后, 您就可以愉快的运行我的代码啦~
+  <br> 运行如下命令以运行代码
+  <br> `python ./src/main.py`
 
 ## 安装一切顺利! 那么我该如何使用呢?
 * 您可以在运行 `main.py` 时附加参数

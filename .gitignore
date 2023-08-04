@@ -1,3 +1,8 @@
 src/__pycache__
 venv/
+dist/
+build/
+
 push.bat
+installer.bat
+main.spec
