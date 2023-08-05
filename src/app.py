@@ -4,29 +4,37 @@ from typing import Callable
 from flask import Flask, send_file
 import os
 
-def scan_dirs(root_path: str, recursion: bool=True, callback: Callable=None):
+def scan_dirs(root_path: str, recursion: bool=True, callback: Callable=None, ignorerror: bool=False):
     root_path = os.path.normpath(root_path)
     files = { root_path: { 'files': [], 'dirs': [] } }  # files list
     # on Windows, like {"C:\": { "files": ["C:\foo_file", "C:\bar"], "dirs": ["C:\foo"] }}
     # on Linux and Mac OS, like {"/": { "files:" ["/foo", "/bar"], "dirs": ["/etc"] }}
+    try:
+        for file in os.listdir(root_path):
+            full_filename = os.path.normpath(os.path.join(root_path, file))
+            if os.path.isfile(full_filename):  # file
+                if callback is not None:
+                    try:
+                        if not callback(full_filename):
+                            continue
+                    except Exception as e:
+                        pass
 
-    for file in os.listdir(root_path):
-        full_filename = os.path.normpath(os.path.join(root_path, file))
-        if os.path.isfile(full_filename):  # file
-            if callback is not None:
-                try:
-                    if not callback(full_filename):
-                        continue
-                except Exception as e:
-                    pass
+                files[root_path]['files'].append(full_filename)
+            else:  # dir
+                if recursion:
+                    try:
+                        files_dict = scan_dirs(full_filename, recursion, callback)[1]
+                        files[root_path]['dirs'].append(full_filename)  # 在 scan_dirs 后添加以免其报错了还是没有删掉
+                        for path, file_list in files_dict.items():
+                            files[path] = file_list
+                    except Exception as e:
+                        if not ignorerror:
+                            raise e
 
-            files[root_path]['files'].append(full_filename)
-        else:  # dir
-            if recursion:
-                files[root_path]['dirs'].append(full_filename)
-                files_dict = scan_dirs(full_filename, recursion, callback)[1]
-                for path, file_list in files_dict.items():
-                    files[path] = file_list
+    except Exception as e:
+        if not ignorerror:
+            raise e
 
     return root_path, files
 
