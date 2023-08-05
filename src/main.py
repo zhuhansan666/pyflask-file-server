@@ -24,10 +24,11 @@ if __name__ == '__main__':
     RECURSION = not args.no_recursion
     IGNORE_ERROR = args.ignore_error
 
-    if not (0 <= PORT <= 65535):
+    if (PORT is not None and not (0 <= PORT <= 65535)):
         print('错误的端口号, 应 0 <= --port <= 65535')
         sys.exit(-1)
 
+    print('加载中, 请稍后...')
     app = Flask(__name__)
     create_pages(app, scan_dirs(WATCH_DIR, RECURSION, ignorerror=IGNORE_ERROR))
 

@@ -36,13 +36,17 @@
 
 ## 安装一切顺利! 那么我该如何使用呢?
 * 您可以在运行 `main.py` / `main.exe` 时附加参数
-* 目前支持的参数有 (`<*>` 代表您需填入的参数)
-    1. `--host=<host>` 启动时监听的主机地址, 默认为 `0.0.0.0` 
-    2. `--port=<port>` 启动时的端口, 默认为 `flask` 默认值, 一般为 `5000`
-    3. `--watch-dir=<dir>` / `--watchdir=<dir>` 启动时扫描的根文件夹, 将显示其内文件, ~~万物起源将从这里开始~~
-    4. `--debug` (附加参数, 如果您携带此参数即视为启用, 下均同) 开启 `flask` 内置的 `DEBUG` 模式. 如果您不知道这是什么, 请勿附带.
-    5. `--no-recursion` 是否不递归扫描(即扫描子文件夹), 默认值为 `True`, 携带本参数后禁用.
-    6. `--ignore-error` / `--ignorerror` 忽略读取文件时发生的错误
+
+* 目前支持的参数有 (`<*>` 代表您需填入的参数; 若默认值为空或`-`时, 即代表您必须传入该参数)
+  | 名称 | 使用方法 | 介绍 | 默认值 |
+  |:-:|:-:|:-:|:-:|
+  | host | `--host=<host>` | 启动时监听的主机地址 | `0.0.0.0` |
+  | port | `--port=<port>` | 启动时的端口 | `flask` 默认值, 一般为 `5000` |
+  | watch-dir | `--watch-dir=<dir>` / `--watchdir=<dir>` | 启动时扫描的根文件夹, 将显示其内文件, ~~万物起源将从这里开始~~ | 当前命令行工作路径 (通过 `os.getcwd()` 获取) |
+  | debug | `--debug` | (附加参数, 如果您携带此参数即视为启用, 下均同) | 开启 `flask` 内置的 `DEBUG` 模式 如果您不知道  么, 请勿附带 | `False` |
+  | no-recursion | `--no-recursion` | 是否不递归扫描(即扫描子文件夹), 携带本参数后禁用 | `True` |
+  | ignore-error | `--ignore-error` / `--ignorerror` | 忽略读取文件时发生的错误 | `False` |
+
 * 示例: 使用 1145 端口监听 `/root` 并忽略错误: `src/main.py --watch-dir=/root --port=1145 --ignore-error`
   > 提示: `--watch-dir /root` 与 `--watch-dir=/root` 等价, 其他参数同理
 
