@@ -1,3 +1,7 @@
+# V0.0.4
+* add: 版本信息显示
+* add: debug 参数传入时 flask 环境变量设置为 开发模式, debug 不传入时使用 waitress 服务器代替 flask 启动服务
+
 # V0.0.3
 * fix: port 参数不传入时程序崩溃
 

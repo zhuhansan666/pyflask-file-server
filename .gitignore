@@ -2,7 +2,7 @@ src/__pycache__
 venv/
 dist/
 build/
+build-tools/
 
 push.bat
-installer.bat
 main.spec
