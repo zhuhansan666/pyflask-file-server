@@ -3,6 +3,17 @@ venv/
 dist/
 build/
 build-tools/
+.vs/
+.git/
+.idea/
+.vscode/
 
+
+build.bat
 push.bat
 main.spec
+
+
+# Added by cargo
+
+/target

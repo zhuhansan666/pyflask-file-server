@@ -1,50 +1,80 @@
 from htmls import MAIN
 
+import asyncio
+import pathlib
 from typing import Callable
-from flask import Flask, send_file
+from quart import Quart, send_file
+from typing import Union
 import os
 
-def scan_dirs(root_path: str, recursion: bool=True, callback: Callable=None, ignorerror: bool=False):
-    root_path = os.path.normpath(root_path)
-    files = { root_path: { 'files': [], 'dirs': [] } }  # files list
+FMapping = dict[Union["files", "dirs"], list[pathlib.Path]]
+
+def catch(func: Callable):
+    def _wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print("What the hell?")
+            if not kwargs.get('ignorerror', True):
+                raise
+    return _wrapper
+
+
+def async_catch(func: Callable):
+    async def _async_wrapper(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except Exception as e:
+            print("What the hell?")
+            if not kwargs.get('ignorerror', True):
+                raise
+    return _async_wrapper
+
+async def scan_dirs(root_path: str | pathlib.Path, recursion: bool=True, callback: Callable=None, ignorerror: bool=True):
+    root_path = pathlib.Path(root_path) if type(root_path) == str else root_path
     # on Windows, like {"C:\": { "files": ["C:\foo_file", "C:\bar"], "dirs": ["C:\foo"] }}
-    # on Linux and Mac OS, like {"/": { "files:" ["/foo", "/bar"], "dirs": ["/etc"] }}
-    try:
-        for file in os.listdir(root_path):
-            full_filename = os.path.normpath(os.path.join(root_path, file))
-            if os.path.isfile(full_filename):  # file
-                if callback is not None:
-                    try:
-                        if not callback(full_filename):
-                            continue
-                    except Exception as e:
-                        pass
+    # on Linux and Mac OS, like {"/": { "files:" ["/foo", "/bar"], "dirs": [
 
-                files[root_path]['files'].append(full_filename)
-            else:  # dir
-                if recursion:
-                    try:
-                        files_dict = scan_dirs(full_filename, recursion, callback)[1]
-                        files[root_path]['dirs'].append(full_filename)  # 在 scan_dirs 后添加以免其报错了还是没有删掉
-                        for path, file_list in files_dict.items():
-                            files[path] = file_list
-                    except Exception as e:
-                        if not ignorerror:
-                            raise e
+    files = { str(root_path): { 'files': set(), 'dirs': set() } }
 
-    except Exception as e:
-        if not ignorerror:
-            raise e
+    @async_catch
+    async def scan_children_dirs(path: pathlib.Path, ignorerror: bool=ignorerror):
+        cc_tasks = set()
+
+        if files.get(str(path), None) is None:
+            files[str(path)] = {'dirs': set(), 'files': set()}
+
+        for f in path.iterdir():
+            if f.is_dir():
+                files[str(path)]['dirs'].add(str(f))
+                cc_tasks.add(scan_children_dirs(f))
+                continue
+
+            files[str(path)]['files'].add(str(f))
+
+        await asyncio.gather(*cc_tasks)
+
+    sc_tasks = set()
+    for f in root_path.iterdir():
+        if f.is_dir():
+            # { '/' : { 'dirs': ['/etc'], '/etc': { 'dirs': [] } }
+            files[str(root_path)]['dirs'].add(str(f))
+            sc_tasks.add(scan_children_dirs(f)) if recursion else None
+            continue
+
+        files[str(root_path)]['files'].add(str(f))
+
+
+    await asyncio.gather(*sc_tasks)
 
     return root_path, files
 
-def create_pages(app: Flask, scan_dirs_tuple: dict[list]):
+def create_pages(app: Quart, scan_dirs_tuple: FMapping):
     root_path = scan_dirs_tuple[0]
     scan_dirs_data = scan_dirs_tuple[1]
-
     for path, _dict in scan_dirs_data.items():
-        files = _dict['files']
-        dirs = _dict['dirs']
+        files = sorted(_dict['files'])
+        dirs = sorted(_dict['dirs'])
 
         path = os.path.relpath(path, root_path)
         urlpath = '/' + (path if path != '.' and path != root_path else '') + '/'
@@ -59,8 +89,8 @@ def create_pages(app: Flask, scan_dirs_tuple: dict[list]):
             url_filename = '/' + os.path.relpath(file, root_path).replace('\\', '/')
 
             def func(filename):
-                def _():
-                    return send_file(filename, as_attachment=True)
+                async def _():
+                    return await send_file(filename, as_attachment=True)
                 return _
 
             app.add_url_rule(url_filename, url_filename, func(os.path.abspath(file)), methods=['GET'])
@@ -77,7 +107,7 @@ def create_pages(app: Flask, scan_dirs_tuple: dict[list]):
         html = MAIN.format(title=f'Directory listing for {urlpath}', body=body)
 
         def func(html):
-            def _():
+            async def _():
                 return html
             return _
 
@@ -85,6 +115,10 @@ def create_pages(app: Flask, scan_dirs_tuple: dict[list]):
 
 
 if __name__ == '__main__':
-    app = Flask(__name__)
-    create_pages(app, scan_dirs('D:\\Admin\\Downloads'))
+    # this is some tests
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    app = Quart(__name__)
+    create_pages(app, loop.run_until_complete(scan_dirs('D:\\', ignorerror=True)))
     app.run('0.0.0.0', debug=True)
