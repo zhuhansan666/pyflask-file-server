@@ -3,18 +3,18 @@ from htmls import MAIN
 import asyncio
 import pathlib
 from typing import Callable
-from quart import Quart, send_file
+from quart import Quart, send_file, abort, Response
 from typing import Union
 import os
 
-FMapping = dict[Union["files", "dirs"], list[pathlib.Path]]
+FMapping = dict[Union['files', 'dirs'], set[pathlib.Path]]
 
 def catch(func: Callable):
     def _wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print("What the hell?")
+            # print(f'call function "{func.__name__}(*{args}, **{kwargs})" has something wrong: {e}')
             if not kwargs.get('ignorerror', True):
                 raise
     return _wrapper
@@ -25,7 +25,7 @@ def async_catch(func: Callable):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            print("What the hell?")
+            # print(f'call function "{func.__name__}(*{args}, **{kwargs})" has something wrong: {e}')
             if not kwargs.get('ignorerror', True):
                 raise
     return _async_wrapper
@@ -90,7 +90,10 @@ def create_pages(app: Quart, scan_dirs_tuple: FMapping):
 
             def func(filename):
                 async def _():
-                    return await send_file(filename, as_attachment=True)
+                    if os.path.exists(filename) and os.path.isfile(filename):
+                        return await send_file(filename, as_attachment=True)
+
+                    await abort(404, 'File not found', 'Make sure your file is existed, please!<br>To get more information, see also the <a href="https://docs.python.org/3/library/os.path.html#os.path.exists">os.path.exists</a>')
                 return _
 
             app.add_url_rule(url_filename, url_filename, func(os.path.abspath(file)), methods=['GET'])

@@ -1,10 +1,10 @@
 # ![image](./icon.png) pyflask-file-server
 
 ## 这是什么?
-* 这是一个仿照 `python -m http.server` 的文件下载服务器, 基于 [python flask](https://flask.palletsprojects.com/)
+* 这是一个仿照 `python -m http.server` 的文件下载服务器, 基于 [python flask](https://flask.palletsprojects.com/) 的 `fork`: [python Quart](https://pgjones.gitlab.io/quart/)
 
 ## 为什么要重写? `python -m http.server` 不好用吗?
-* 并不是它不好用, 而是使用 `flask` 重写后可以使它支持 [断点续传](#什么是断点续传), 对多线程下载有所帮助
+* 并不是它不好用, 而是使用 `Quart` 重写后可以使它支持 [断点续传](#什么是断点续传), 对多线程下载有所帮助
 
 ## 好的, 那么我该如何安装呢?
 * 直接从 `Releases` 下载 (仅限 `Windows`)
@@ -40,12 +40,15 @@
 * 目前支持的参数有 (`<*>` 代表您需填入的参数; 若默认值为`-`时, 即代表您必须传入该参数)
   | 名称 | 使用方法 | 介绍 | 默认值 |
   | :-: | :-: | :-: | :-: |
+  | help | `--help` / `-h` | 显示帮助信息 | |
   | host | `--host=<host>` | 启动时监听的主机地址 | `0.0.0.0` |
-  | port | `--port=<port>` | 启动时的端口 | 在生产环境时, 默认为 `5000`; 在开发环境时, 为 `flask` 默认值, 一般为 `5000` |
+  | port | `--port=<port>` | 启动时的端口 | 在生产环境时, 默认为 `5000`; 在开发环境时, 为 `quart` 默认值, 一般为 `5000` |
   | watch-dir | `--watch-dir=<dir>` / `--watchdir=<dir>` | 启动时扫描的根文件夹, 将显示其内文件, ~~万物起源将从这里开始~~ | 当前命令行工作路径 (通过 `os.getcwd()` 获取) |
-  | debug | `--debug` | (附加参数, 如果您携带此参数即视为启用, 下均同) | 开启 `flask` 内置的 `DEBUG` 模式 如果您不知道  么, 请勿附带 | `False` |
+  | debug | `--debug` | (附加参数, 如果您携带此参数即视为启用, 下均同) | 开启 `quart` 内置的 `DEBUG` 模式 如果您不知道  么, 请勿附带 | `False` |
   | no-recursion | `--no-recursion` | 是否不递归扫描(即扫描子文件夹), 携带本参数后禁用 | `False` |
   | ignore-error | `--ignore-error` / `--ignorerror` | 忽略读取文件时发生的错误 | `True` |
+
+  **要获取更多信息, 请携带 `--help` 参数**
 
 * 示例: 使用 1145 端口监听 `/root` 并忽略错误: `src/main.py --watch-dir=/root --port=1145 --ignore-error`
   > 提示: `--watch-dir /root` 与 `--watch-dir=/root` 等价, 其他参数同理
